@@ -1,0 +1,40 @@
+
+.chess-piece
+    svg
+        margin: 7%
+        width: 86%
+        height: 86%
+        stroke-width: 2%
+
+    &--white
+        svg
+            fill: #f3ded2
+            stroke: #643817
+
+    &--black
+        svg
+            fill: #000
+            stroke: #ffe4b0
+
+    .chess-board &
+        position: absolute
+        left: 0
+        top: 0
+        width: 100%
+        height: 100%
+
+    .chess-ui--turn-of-white &--black
+        opacity: 0.7
+        cursor: not-allowed
+
+    .chess-ui--turn-of-black &--white
+        opacity: 0.7
+        cursor: not-allowed
+
+.cp-drag-wrapper
+    width: 100%
+    height: 100%
+    cursor: -webkit-grab
+    &--drag
+        box-shadow: inset 0 0 0 4px #b40000
+        cursor: -webkit-grabbing

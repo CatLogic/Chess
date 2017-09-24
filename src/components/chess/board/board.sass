@@ -1,0 +1,88 @@
+$offset: 3rem
+$coordOffset: 0.5rem
+$black: #ae6227
+$white: #ffe4b0
+
+.chess-board
+    position: relative
+    padding: $offset
+
+    &__coords
+        position: absolute
+        display: flex
+        user-select: none
+
+        &--horizontal
+            left: $offset
+            right: $offset
+            .chess-board__coords-item
+                line-height: $offset - $coordOffset
+
+        &--vertical
+            bottom: $offset
+            top: $offset
+            flex-direction: column
+            width: $offset - $coordOffset
+
+            .chess-board__coords-item
+                display: flex
+                flex-direction: column
+                justify-content: center
+
+        &--top
+            top: $coordOffset
+
+        &--bottom
+            bottom: $coordOffset
+
+        &--left
+            left: $coordOffset
+
+        &--right
+            right: $coordOffset
+
+    &__coords-item
+        flex-shrink: 0
+        flex-grow: 1
+        text-align: center
+        //line-height: $offset - $coordOffset
+        font-size: 1.3em
+        font-weight: bold
+
+    &__cells
+        display: flex
+        flex-wrap: wrap
+        border: 1px solid $black
+
+    &__cell
+        flex-shrink: 0
+        width: (100%/8)
+        background: #ffe4b0
+        position: relative
+
+        &:after
+            content: ""
+            display: block
+            padding-bottom: 100%
+
+        &:before
+            content: ""
+            position: absolute
+            left: 0
+            right: 0
+            top: 0
+            bottom: 0
+
+        &--black
+            background-color: $black
+
+        &--possible-step
+            &:before
+                background: blue
+
+        &--over
+            &:before
+                background: red
+
+
+
