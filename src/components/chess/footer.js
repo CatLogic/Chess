@@ -6,7 +6,7 @@ class ChessUiFooter extends Component {
         let innerMarkUp;
 
         switch (state) {
-            case("started"):
+            case("started"):{
                 innerMarkUp = (
                     <div className="chess-ui__footer-inner chess-ui__footer--game-start">
                         Игра начата
@@ -15,6 +15,7 @@ class ChessUiFooter extends Component {
                     </div>
                 );
                 break;
+            }
 
             case("finished"):
                 innerMarkUp = (
@@ -29,7 +30,7 @@ class ChessUiFooter extends Component {
                 innerMarkUp = (
                     <div className="chess-ui__footer-inner chess-ui__footer--game-start">
                         <a className="button is-primary is-large" onClick={() => {
-                            actions.start()
+                            actions.start();
                         }}>Начать игру</a>
                     </div>
                 );
@@ -39,7 +40,7 @@ class ChessUiFooter extends Component {
             <footer className="card-content chess-ui__footer">
                 {innerMarkUp}
             </footer>
-        )
+        );
     }
 }
 

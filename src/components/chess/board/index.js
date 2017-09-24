@@ -7,7 +7,7 @@ import Cells from "./cells";
 const Coordinates = ({vector, position}) => {
     const itemValues = vector === "vertical" ?
         [8, 7, 6, 5, 4, 3, 2, 1] :
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        ["a", "b", "c", "d", "e", "f", "g", "h"];
 
     return (
         <div
@@ -15,7 +15,7 @@ const Coordinates = ({vector, position}) => {
             {itemValues.map((val) => (<div key={position + "_" + val} className="chess-board__coords-item">{val}</div>))
             }
         </div>
-    )
+    );
 };
 
 class ChessUiBoard extends Component {
@@ -29,7 +29,7 @@ class ChessUiBoard extends Component {
                 <Coordinates vector="vertical" position="right"/>
                 <Cells cells={cells} currentPlayer={currentPlayer} actions={actions}/>
             </div>
-        )
+        );
     }
 }
 

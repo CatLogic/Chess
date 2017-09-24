@@ -30,7 +30,7 @@ const vectorCPFactory = (name, side) => {
             vectorNames.downLeft,
             vectorNames.left,
             vectorNames.upLeft
-        ]
+        ];
     }
     return vectors;
 };

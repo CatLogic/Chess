@@ -1,5 +1,5 @@
 import React from "react";
-import {DropTarget} from 'react-dnd';
+import {DropTarget} from "react-dnd";
 import {dragType} from "../../../consts";
 
 const Cell = ({color, children, isMoveCandidate,isOver, connectDropTarget}) => {
@@ -19,7 +19,7 @@ const dropSpec = {
         return props.isMoveCandidate;
     },
     drop(props,monitor) {
-        props.validDropCallback(monitor.getItem().coords, props.coords)
+        props.validDropCallback(monitor.getItem().coords, props.coords);
     }
 };
 

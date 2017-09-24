@@ -25,8 +25,8 @@ export default class ChessPiece {
     }
 
     // todo переписать
-    moveCallback(currentCoords) {
-        if (this.name === 'pawn') this.stepLength = 1;
+    moveCallback() {
+        if (this.name === "pawn") this.stepLength = 1;
     }
 }
 

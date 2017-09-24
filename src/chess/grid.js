@@ -112,7 +112,7 @@ class Grid {
                     // Knight should do full vector loop because it`s not real vector ray
                     else if (!isKnightException) return false;
                 }
-            })
+            });
         });
 
         return validCells;
@@ -150,7 +150,7 @@ class Grid {
                     if (shouldBreak) return false;
                 }
             }
-        })
+        });
     }
 }
 

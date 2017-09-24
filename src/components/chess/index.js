@@ -29,7 +29,7 @@ class ChessUi extends Component {
             collectPossibleSteps: (coords) => (chessApi.possibleMoves(coords)),
             move: (from, to) => {
                 chessApi.move(from, to);
-                this.setState({currentPlayer: chessApi.currentPlayerName()})
+                this.setState({currentPlayer: chessApi.currentPlayerName()});
             }
         };
 
@@ -41,7 +41,7 @@ class ChessUi extends Component {
             <div className={className}>
                 <header className="chess-ui__header">
                     <h1>Chess</h1>
-                    <p>Игра не предусматривает наличие "бота". Вам придётся играть самому с собой, либо позвать
+                    <p>Игра не предусматривает наличие &quot;бота&quot;. Вам придётся играть самому с собой, либо позвать
                         соперника.</p>
                 </header>
 

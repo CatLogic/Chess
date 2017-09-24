@@ -47,7 +47,7 @@ class Player {
                 );
             }
             return isTarget;
-        })
+        });
     }
 }
 

@@ -27,10 +27,10 @@ class Cells extends Component {
                     currentPlayer,
                     collectPossibleSteps: () => {
                         const validSteps = actions.collectPossibleSteps(coords);
-                        if (validSteps) this.setState({possibleSteps: validSteps})
+                        if (validSteps) this.setState({possibleSteps: validSteps});
                     },
                     dropPossibleSteps: () => {
-                        this.setState({possibleSteps: null})
+                        this.setState({possibleSteps: null});
                     }
                 });
 
@@ -40,7 +40,7 @@ class Cells extends Component {
                     color={(colI + rowI) % 2 ? "white" : "black"}
                     isMoveCandidate={isMoveCandidate}
                     validDropCallback={actions.move}
-                >{ChessPiece}</Cell>))
+                >{ChessPiece}</Cell>));
             }
         }
 
@@ -48,7 +48,7 @@ class Cells extends Component {
             <div className="chess-board__cells">
                 {cellsComponents.map(component => component)}
             </div>
-        )
+        );
     }
 }
 

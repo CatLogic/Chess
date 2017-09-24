@@ -40,7 +40,7 @@ class DraggableCPWrapper extends Component {
             <div className={wrapperClassName}>
                 <ChessPiece name={name} tagName={tagName}/>
             </div>
-        )
+        );
     }
 }
 

@@ -34,9 +34,8 @@ class Chess {
 
         const placeRow = (rowI, player) => {
             for (let colI = 1; colI <= 8; colI++) {
-                let cpName = chessPiecesOrder
-                    [(player.tagName === "white" ? rowI + 1 : rowI) % 2]
-                    [colI - 1];
+                let cpName =
+                    chessPiecesOrder[(player.tagName === "white" ? rowI + 1 : rowI) % 2][colI - 1];
                 let chessPiece = new ChessPiece(cpName, player.tagName);
 
                 player.addPiece(chessPiece);
@@ -45,11 +44,11 @@ class Chess {
         };
         // White player
         for (let rowI = 1; rowI <= 2; rowI++) {
-            placeRow(rowI, this.players.white)
+            placeRow(rowI, this.players.white);
         }
         // Black player
         for (let rowI = 7; rowI <= 8; rowI++) {
-            placeRow(rowI, this.players.black)
+            placeRow(rowI, this.players.black);
         }
     }
 

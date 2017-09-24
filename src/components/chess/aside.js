@@ -1,6 +1,7 @@
-import React, {Component} from "react";
+import React from "react";
 
-
-export default () => (<aside className="card chess-ui__aside">
-    <div className="card-content"></div>
+const ChessUiAside = () => (<aside className="card chess-ui__aside">
+    <div className="card-content"/>
 </aside>);
+
+export default ChessUiAside;
