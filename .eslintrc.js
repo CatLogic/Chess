@@ -28,7 +28,7 @@ module.exports = {
             "error",
             "windows"
         ],
-        "no-console": ["error", {
+        "no-console": ["warn", {
             "allow": ["time", "timeEnd"]
         }],
         "quotes": [

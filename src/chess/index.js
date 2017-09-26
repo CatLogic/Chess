@@ -26,7 +26,7 @@ class Chess {
         console.timeEnd("Start");
     }
 
-    initDefaultGridState(){
+    initDefaultGridState() {
         const chessPiecesOrder = [
             [cpNames.rook, cpNames.knight, cpNames.bishop, cpNames.queen, cpNames.king, cpNames.bishop, cpNames.knight, cpNames.rook],
             [cpNames.pawn, cpNames.pawn, cpNames.pawn, cpNames.pawn, cpNames.pawn, cpNames.pawn, cpNames.pawn, cpNames.pawn]
@@ -59,7 +59,7 @@ class Chess {
         if (!cpOnFrom) throw new Error("Nothing can`t be moved.");
         if (this.currentPlayer.getSide() !== cpOnFrom.getSide()) throw new Error("Players can move only their chess pieces.");
 
-        let moveResult = this.grid.move( from, to);
+        let moveResult = this.grid.move(from, to);
         if (moveResult.valid) {
             this.currentPlayer = this.currentPlayer.tagName === "white" ?
                 this.players["black"] :
@@ -91,7 +91,7 @@ class Chess {
         else throw new Error("Nothing to collect. Game isn`t started.");
     }
 
-    playerWon(winner){
+    playerWon(winner) {
         const winnerSide = winner.getSide();
         this.state = "finished";
         this.currentPlayer = null;
@@ -118,10 +118,10 @@ class Chess {
             if (isSameCoords([x, y], kingCoords)) playerToCheckStatus.inDanger = true;
         });
 
-        if(playerToCheckStatus.inDanger && playerToCheckStatus.canMove) {
+        if (playerToCheckStatus.inDanger && playerToCheckStatus.canMove) {
             checkingPlayer.setState(playerStatuses.checkmate);
         }
-        else if(playerToCheckStatus.inDanger) checkingPlayer.setState(playerStatuses.check);
+        else if (playerToCheckStatus.inDanger) checkingPlayer.setState(playerStatuses.check);
         else checkingPlayer.setState(playerStatuses.safe);
     }
 
@@ -130,10 +130,9 @@ class Chess {
         else throw new Error("Game isn`t started. Current player don`t exist.");
     }
 
-    getPlayers(){
+    getPlayers() {
         return this.players;
     }
 }
-
 
 export default Chess;

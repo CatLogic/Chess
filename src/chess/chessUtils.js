@@ -8,11 +8,7 @@ export const cellNameToCoords = (name) => ([cellCharToInt(name[0]) + 1, +name[1]
 
 export const cellCoordsToName = (coords) => (intToAlpha(coords[0]) + coords[1]);
 
-export const inBounds = ([x, y]) => {
-    x = Math.abs(x);
-    y = Math.abs(y);
-    return (x >= 1 && x <= 8) && (y >= 1 && y <= 8);
-};
+export const inBounds = ([x, y]) => (x >= 1 && x <= 8) && (y >= 1 && y <= 8);
 
 export const isSameCoords = (c1, c2) => ((c1[0] === c2[0]) && (c1[1] === c2[1]));
 
@@ -69,17 +65,31 @@ export const vectorNext = {
     }
 };
 
+const vectorIterators = {
+    "default": function* (startPoint, vName) {
+        let current = startPoint;
+        for (let valid = inBounds(current); valid; valid = inBounds(current)) {
+            current = vectorNext[vName](current);
+            yield current;
+        }
+    },
+    "knight": function* (startPoint) {
+        let current = startPoint;
+        for (let i = 0; i <= 7; i++) {
+            current = vectorNext["knight"](startPoint, i);
+            if (inBounds(current)) yield current;
+        }
+    }
+};
+
 export const vectorRay = function (vectorName, startPoint, callback) {
-    let i = 0;
-    let getNextVector = vectorNext[vectorName];
-    let isKnight = vectorName === "knight";
-    let currentPoint = startPoint;
-    while (i < 8) {
-        // Usually starting point isn`t required, so we immediately looking for next
-        // But if its knight piece, we need only starting point and number of iteration
-        currentPoint = getNextVector(isKnight ? startPoint : currentPoint, i);
-        const outOfBounds = !inBounds(isKnight ? startPoint : currentPoint);
-        if ((callback(currentPoint) === false) || outOfBounds) break;
-        i++;
+    let iterator = vectorName !== "knight" ?
+        vectorIterators.default(startPoint, vectorName) :
+        vectorIterators.knight(startPoint);
+
+    while (true) { // eslint-disable-line
+        let {value, done} = iterator.next();
+        if (done) break;
+        if (callback(value) === false) break;
     }
 };

@@ -129,8 +129,7 @@ class Grid {
         let cpSide = chessPiece.getSide();
         let wasEnemyOnPrevCell = null;
 
-        vectorRay(vectorName, coords, (curCoords, isOutOfBounds) => {
-            if (isOutOfBounds) return false;
+        vectorRay(vectorName, coords, (curCoords) => {
             // Regularly loop stop on next iteration after enemy cp
             if (wasEnemyOnPrevCell && shouldStopAfterEnemy) return false;
             const thisCell = this.getCell(curCoords);

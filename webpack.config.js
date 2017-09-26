@@ -44,7 +44,15 @@ module.exports = {
                 loader: require.resolve('babel-loader'),
                 options: {
                     presets: ["env", "react"],
-                    plugins: ["syntax-object-rest-spread"],
+                    plugins: [
+                        "syntax-object-rest-spread",
+                        ["transform-runtime", {
+                            "helpers": false,
+                            "polyfill": false,
+                            "regenerator": true,
+                            "moduleName": "babel-runtime"
+                        }]
+                    ],
                     cacheDirectory: true,
                 }
             },
