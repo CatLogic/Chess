@@ -1,0 +1,21 @@
+.chess-board-wr
+    position: relative
+
+.chess-board-modal
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate3d(-50%,-50%,0)
+    max-width: 80%
+    max-height: 80%
+    min-width: 400px
+
+    &--center
+        text-align: center
+
+    &--hover-opaque
+        opacity: 0.75
+        transition: 0.4s
+        &:hover
+            opacity: 1
+            transition: 0.2s

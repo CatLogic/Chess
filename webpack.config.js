@@ -1,10 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const ExtractCss = new ExtractTextPlugin({
-    filename: "styles.css"
-});
 
+//const TestPlugin = require('./testPlugin');
 
 module.exports = {
     entry: './src/index.js',
@@ -24,12 +22,13 @@ module.exports = {
         contentBase: path.resolve(__dirname, './public/'),
         publicPath: "/",
         watchContentBase: true,
-        quiet: true,
+        //quiet: true,
         compress: true,
         port: 3000,
         watchOptions: {
             ignored: /node_modules/,
         },
+        hot: true
     },
     module: {
         rules: [
@@ -51,23 +50,21 @@ module.exports = {
             },
             {
                 test: [/\.sass$/, /\.scss$/, /\.css$/],
-                use: ExtractCss.extract({
-                    fallback: "style-loader",
-                    use: [
-                        {
-                            loader: "css-loader",
-                            options: {
-                                sourceMap: true,
-                            }
-                        },
-                        {
-                            loader: "sass-loader",
-                            options: {
-                                sourceMap: true,
-                            }
+                use: [
+                    "style-loader",
+                    {
+                        loader: "css-loader",
+                        options: {
+                            sourceMap: true,
                         }
-                    ]
-                })
+                    },
+                    {
+                        loader: "sass-loader",
+                        options: {
+                            sourceMap: true,
+                        }
+                    }
+                ]
             },
             {
                 test: /\.svg$/,
@@ -100,11 +97,12 @@ module.exports = {
         ]
     },
     plugins: [
-        ExtractCss,
         new webpack.DefinePlugin({
             "process.env": {
                 NODE_ENV: JSON.stringify(process.env.NODE_ENV)
             }
-        })
+        }),
+        new webpack.HotModuleReplacementPlugin()
+        //new TestPlugin("hello world")
     ]
 }; 

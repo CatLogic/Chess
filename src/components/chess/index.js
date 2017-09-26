@@ -1,7 +1,8 @@
 import React, {Component} from "react";
-import ChessUiFooter from "./footer";
+import classNames from "classnames";
+import ChessUiHeader from "./header";
 import ChessUiAside from "./aside";
-import ChessUiBoard from "./board/";
+import ChessUiBoardSection from "./boardSection/index";
 import "./chess.sass";
 import Chess from "../../chess/";
 
@@ -17,40 +18,53 @@ class ChessUi extends Component {
     }
 
     render() {
+        // todo clean the mess after redux implementation
         let self = this;
         let {chessApi, currentPlayer} = this.state;
+
+        let apiPlayers = chessApi.getPlayers();
+        let players = null;
+        if (apiPlayers) {
+            players = {};
+            for (let playerName in apiPlayers) {
+                let player = apiPlayers[playerName];
+                players[player.getSide()] = {
+                    isCurrent: player.getSide() === currentPlayer,
+                    state: player.getState(),
+                    chessPieces: player.getChessPieces(),
+                };
+            }
+        }
+
         let actions = {
+            collectPossibleSteps: (coords) => (chessApi.possibleMoves(coords)),
+            move: (from, to) => {
+                chessApi.move(from, to);
+                this.setState({currentPlayer: chessApi.currentPlayerName()});
+            },
             start: () => {
                 chessApi.start();
                 self.setState({gameState: chessApi.state, currentPlayer: chessApi.currentPlayerName()});
             }
         };
-        let boardActions = {
-            collectPossibleSteps: (coords) => (chessApi.possibleMoves(coords)),
-            move: (from, to) => {
-                chessApi.move(from, to);
-                this.setState({currentPlayer: chessApi.currentPlayerName()});
-            }
-        };
 
 
-        let className = "container chess-ui";
-        className += " chess-ui--" + chessApi.state;
-        if (currentPlayer) className += " chess-ui--turn-of-" + currentPlayer;
         return (
-            <div className={className}>
-                <header className="chess-ui__header">
-                    <h1>Chess</h1>
-                    <p>Игра не предусматривает наличие &quot;бота&quot;. Вам придётся играть самому с собой, либо позвать
-                        соперника.</p>
-                </header>
-
+            <div className={classNames(
+                "container", "chess-ui",
+                "chess-ui--" + chessApi.state,
+                currentPlayer ? "chess-ui--turn-of-" + currentPlayer : ""
+            )}>
+                <ChessUiHeader/>
                 <div className="chess-ui__game-cols">
                     <div className="card chess-card chess-ui__game-wr">
-                        <ChessUiBoard cells={chessApi.grid.cells} currentPlayer={currentPlayer} actions={boardActions}/>
-                        <ChessUiFooter state={chessApi.state} actions={actions}/>
+                        <ChessUiBoardSection
+                            cells={chessApi.grid.cells}
+                            state={this.state.gameState}
+                            currentPlayer={currentPlayer}
+                            actions={actions}/>
                     </div>
-                    <ChessUiAside/>
+                    {!!players && <ChessUiAside players={players}/>}
                 </div>
             </div>
         );

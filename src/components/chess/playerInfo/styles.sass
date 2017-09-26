@@ -1,0 +1,35 @@
+$piHeader__tb: 0.3rem
+$piHeader__rl: 1rem
+
+.player-info
+    margin-bottom: 1.5rem
+    transition: 0.2s
+    transform: scale(0.94)
+    opacity: 0.8
+
+    &--current
+        transform: scale(1)
+        opacity: 1
+
+
+    &__header
+        display: flex
+        justify-content: space-between
+        align-items: center
+
+    &__header-item
+        padding: $piHeader__tb $piHeader__rl
+        flex-shrink: 0
+
+        &--name
+            font-size: 130%
+            font-weight: bold
+            &:first-letter
+                text-transform: uppercase
+
+        &--state
+            white-space: nowrap
+
+
+
+

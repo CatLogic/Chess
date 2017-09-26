@@ -129,6 +129,10 @@ class Chess {
         if (this.state === "started") return this.currentPlayer ? this.currentPlayer.tagName : null;
         else throw new Error("Game isn`t started. Current player don`t exist.");
     }
+
+    getPlayers(){
+        return this.players;
+    }
 }
 
 

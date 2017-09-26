@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "bulma": "^0.5.1",
+    "classnames": "^2.2.5",
     "react": "^15.6.1",
     "react-dnd": "^2.5.1",
     "react-dnd-html5-backend": "^2.5.1",

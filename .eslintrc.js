@@ -19,7 +19,10 @@ module.exports = {
         "indent": [
             "error",
             4,
-            {"SwitchCase": 1}
+            {
+                "SwitchCase": 1,
+                "ignoredNodes": ["JSXAttribute", "JSXSpreadAttribute"]
+            }
         ],
         "linebreak-style": [
             "error",
@@ -36,6 +39,7 @@ module.exports = {
             "error",
             "always"
         ],
-        "react/prop-types": ["off"] // Next time!
+        "react/prop-types": ["off"], // Next time!
+        "react/jsx-indent-props": [0]
     }
 };

@@ -22,8 +22,8 @@ export const stepVectors = {
 
 export const playerStatuses = {
     safe: "safe",
-    check: "check",
-    checkmate: "checkPlayer",
+    inCheck: "inCheck",
+    checkmated: "checkmated",
     stalemate: "stalemate",
     winner: "winner",
     loser: "loser"
