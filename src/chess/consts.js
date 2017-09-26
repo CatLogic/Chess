@@ -1,4 +1,5 @@
 // Chess class constants
+
 export const chessPiecesNames = {
     pawn: "pawn",
     rook: "rook",
@@ -18,6 +19,12 @@ export const stepVectors = {
     left: "left",
     upLeft: "upLeft",
     knight: "knight",
+};
+
+export const defaultVectorConfig = {
+    onAlly: [false, true], // isValidStep, shouldStop
+    onEnemy: [true, true],
+    onEmpty: [true, false],
 };
 
 export const playerStatuses = {

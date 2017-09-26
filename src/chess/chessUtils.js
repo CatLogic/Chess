@@ -12,7 +12,6 @@ export const inBounds = ([x, y]) => (x >= 1 && x <= 8) && (y >= 1 && y <= 8);
 
 export const isSameCoords = (c1, c2) => ((c1[0] === c2[0]) && (c1[1] === c2[1]));
 
-
 export const getPathDif = (from, to) => {
     let fromCoords = from === "string" ? cellNameToCoords(from) : from;
     let toCoords = to === "string" ? cellNameToCoords(to) : to;
@@ -90,6 +89,6 @@ export const vectorRay = function (vectorName, startPoint, callback) {
     while (true) { // eslint-disable-line
         let {value, done} = iterator.next();
         if (done) break;
-        if (callback(value) === false) break;
+        if (!inBounds(value) || callback(value) === false) break;
     }
 };

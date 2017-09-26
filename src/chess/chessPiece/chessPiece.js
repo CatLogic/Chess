@@ -1,11 +1,14 @@
 import checkStepCollection from "./checkers";
-import chessConstructorFactory from "./cpFactory";
+import vectorConfigs from "./vectorConfigs";
+import {stepVectors as vNames} from "../consts";
 
 export default class ChessPiece {
     constructor(name = "pawn", side) {
         this.name = name;
         this.side = side;
-        chessConstructorFactory(this);
+        this.vectors = typeof vectorConfigs[name] === "function" ?
+            vectorConfigs[name](side) :
+            vectorConfigs[name];
     }
 
     isValidStep(coordDif) {
@@ -24,11 +27,16 @@ export default class ChessPiece {
         return this.name;
     }
 
-    // todo переписать
+    getVectors() {
+        return this.vectors;
+    }
+
+    // Reasonable only for pawns,
+    // but it is still not enough to use class to each piece
     moveCallback() {
-        if (this.name === "pawn") this.stepLength = 1;
+        if (this.name === "pawn") {
+            const vectorName = this.side === "white" ? vNames.up : vNames.down;
+            this.vectors.find(v => v.name === vectorName).maxLength = 1;
+        }
     }
 }
-
-
-

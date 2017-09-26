@@ -1,4 +1,5 @@
 import {cellCharToInt, vectorRay} from "./chessUtils";
+import {defaultVectorConfig} from "./consts";
 import Cell from "./cell";
 
 class Grid {
@@ -70,7 +71,6 @@ class Grid {
 
         /* Successful */
         this.movePiece(from, to);
-        //todo remove callback
         cpOnFrom.moveCallback && cpOnFrom.moveCallback(toCell.coords);
         return {
             valid: true,
@@ -78,77 +78,55 @@ class Grid {
         };
     }
 
-    // todo: remove knight exception
     collectPossibleMoves(coords) {
         const fromCell = this.getCell(coords);
         const chessPiece = fromCell.getPiece();
-        // Knight vector check is not really vector
-        const isKnightException = chessPiece.getName() === "knight";
         const validCells = [];
 
         chessPiece.vectors.forEach((name) => {
-            this.vectorRayFacade(name, fromCell, {
-                shouldStopOnAlly: !isKnightException,
-                shouldStopAfterEnemy: !isKnightException,
-                onlyInBounds: !isKnightException,
-                onCell: function (cell) {
-                    const curCoords = cell.getCoords();
-                    const isValidMove = chessPiece.isValidStep([
-                        curCoords[0] - coords[0],
-                        curCoords[1] - coords[1],
-                    ]);
-
-                    if (isValidMove) {
-                        if (!isKnightException) {
-                            validCells.push(curCoords);
-                        } else {
-                            let piece = cell.getPiece();
-                            // Empty and valid cell
-                            if (!piece) validCells.push(curCoords);
-                            // Cell with enemy cp on it
-                            else if (piece.getSide() !== chessPiece.getSide()) validCells.push(curCoords);
-                        }
-                    }
-                    // Knight should do full vector loop because it`s not real vector ray
-                    else if (!isKnightException) return false;
-                }
+            this.vectorRayFacade(name, fromCell, function (cell) {
+                const curCoords = cell.getCoords();
+                validCells.push(curCoords);
             });
         });
 
         return validCells;
     }
 
-    vectorRayFacade(vectorName, cell, options) {
-        let {
-            shouldStopOnAlly = true,
-            shouldStopAfterEnemy = true,
-            onCell: onCellCallback
-        } = options;
+    vectorRayFacade(vector, cell, callback) {
+        const vConfig = Object.assign(
+            {}, defaultVectorConfig,
+            typeof vector === "string" ? {name: vector} : vector
+        );
+
         let coords = cell.getCoords();
         let chessPiece = cell.getPiece();
         let cpSide = chessPiece.getSide();
-        let wasEnemyOnPrevCell = null;
 
-        vectorRay(vectorName, coords, (curCoords) => {
-            // Regularly loop stop on next iteration after enemy cp
-            if (wasEnemyOnPrevCell && shouldStopAfterEnemy) return false;
+        let maxIterations = vConfig.maxLength || chessPiece.stepLength;
+        let iteration = 0;
+
+        vectorRay(vConfig.name, coords, (curCoords) => {
+            if (maxIterations && iteration >= maxIterations) return false;
             const thisCell = this.getCell(curCoords);
-            if (thisCell) {
-                const thisCp = thisCell.getPiece();
+            const thisCellPiece = thisCell.getPiece();
+            let cellContain = thisCellPiece ?
+                (thisCellPiece.getSide() === cpSide ? "ally" : "enemy") :
+                null;
 
-                if (thisCp) {
-                    const isEnemy = cpSide !== thisCp.getSide();
-                    // A CP of the same player blocking the way
-                    if (!isEnemy && shouldStopOnAlly) return false;
-                    // If we met enemy cp, we inform next iteration and it will break loop
-                    if (isEnemy) wasEnemyOnPrevCell = true;
-                }
-                // If callback returns false, we break loop
-                if (onCellCallback) {
-                    const shouldBreak = onCellCallback(thisCell);
-                    if (shouldBreak) return false;
-                }
+            if (cellContain === "ally") {
+                if (vConfig.onAlly[0]) callback(thisCell);
+                if (vConfig.onAlly[1]) return false;
             }
+            else if (cellContain === "enemy") {
+                if (vConfig.onEnemy[0]) callback(thisCell);
+                if (vConfig.onEnemy[1]) return false;
+            }
+            else if (cellContain === null) {
+                if (vConfig.onEmpty[0]) callback(thisCell);
+                if (vConfig.onEmpty[1]) return false;
+            }
+            iteration++;
         });
     }
 }
