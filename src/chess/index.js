@@ -1,4 +1,4 @@
-import {chessPiecesNames as cpNames, playerStatuses} from "./consts";
+import {cpNames as cpNames, playerStatuses} from "./consts";
 import {isSameCoords} from "./chessUtils";
 import Player from "./player";
 import Grid from "./grid";

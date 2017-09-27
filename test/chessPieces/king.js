@@ -5,11 +5,6 @@ describe("King tests", function () {
     const ChessPiece = require('../../src/chess/chessPiece/chessPiece').default;
     const king = new ChessPiece('king', "white");
 
-    it("King vectors: all", () => {
-        assert.equal(
-            ["up", "upRight", "right", "downRight", "down", "downLeft", "left", "upLeft"].toString(),
-            king.vectors.toString())
-    });
     it("King step length on start: 1", () => {
         assert.equal(1, king.stepLength)
     });

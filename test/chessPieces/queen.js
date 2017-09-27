@@ -5,15 +5,6 @@ describe("Queen tests", function () {
     const ChessPiece = require('../../src/chess/chessPiece/chessPiece').default;
     const queen = new ChessPiece('queen', "white");
 
-    it("Queen vectors: all", () => {
-        assert.equal(
-            ["up", "upRight", "right", "downRight", "down", "downLeft", "left", "upLeft"].toString(),
-            queen.vectors.toString())
-    });
-    it("Queen step length on start: 0", () => {
-        assert.equal(0, queen.stepLength)
-    });
-
     describe("Queen step checks", function () {
         it("[x:0,y:7]", () => {
             assert.equal(true, queen.isValidStep([0, 7]))

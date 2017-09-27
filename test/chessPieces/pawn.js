@@ -6,12 +6,8 @@ describe("Pawn tests", function () {
     const whitePawn = new ChessPiece("pawn", "white");
     const blackPawn = new ChessPiece("pawn", "black");
 
-    it("pawn vectors: [up]", () => {
-        assert.equal(["up"].toString(), whitePawn.vectors.toString());
-        assert.equal(["down"].toString(), blackPawn.vectors.toString());
-    });
     it("pawn step length on start: 2", () => {
-        assert.equal(2, whitePawn.stepLength)
+        assert.equal(2, whitePawn.getVectors()[0].maxLength)
     });
 
     describe("White pawn step checks", function () {
@@ -24,8 +20,10 @@ describe("Pawn tests", function () {
         it("[x:0,y:3]:false", () => {
             assert.equal(false, whitePawn.isValidStep([0, 3]))
         });
-        it("[x:1,y:1]:false", () => {
-            assert.equal(false, whitePawn.isValidStep([1, 1]))
+        // Could be valid if there is gonna be enemy,
+        // but ChessPiece don`t aware of it, so it`s still valid.
+        it("[x:1,y:1]", () => {
+            assert.equal(true, whitePawn.isValidStep([1, 1]))
         });
         it("[x:0,y:-1]:false", () => {
             assert.equal(false, whitePawn.isValidStep([0, -1]))
@@ -42,8 +40,10 @@ describe("Pawn tests", function () {
         it("[x:0,y:-5]:false", () => {
             assert.equal(false, blackPawn.isValidStep([0, -5]))
         });
-        it("[x:1,y:-1]:false", () => {
-            assert.equal(false, blackPawn.isValidStep([1, -1]))
+        // Could be valid if there is gonna be enemy,
+        // but ChessPiece don`t aware of it, so it`s still valid.
+        it("[x:1,y:-1]", () => {
+            assert.equal(true, blackPawn.isValidStep([1, -1]))
         });
         it("[x:0,y:1]:false", () => {
             assert.equal(false, blackPawn.isValidStep([0, 1]))

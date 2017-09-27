@@ -1,6 +1,6 @@
 // Chess class constants
 
-export const chessPiecesNames = {
+export const cpNames = {
     pawn: "pawn",
     rook: "rook",
     knight: "knight",

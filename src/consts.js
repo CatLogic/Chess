@@ -1,6 +1,6 @@
 // Application constants
 
-import {chessPiecesNames} from "./chess/consts";
-export {chessPiecesNames};
+import {cpNames} from "./chess/consts";
+export {cpNames};
 
 export const dragType = "piece";

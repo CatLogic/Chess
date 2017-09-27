@@ -1,4 +1,4 @@
-import {stepVectors as vNames, chessPiecesNames as cpNames} from "../consts";
+import {stepVectors as vNames, cpNames as cpNames} from "../consts";
 
 /*
 * Vector config example:

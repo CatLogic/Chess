@@ -1,5 +1,5 @@
 import {vectorCheck} from "../chessUtils";
-import {chessPiecesNames as cpNames} from "../consts";
+import {cpNames as cpNames} from "../consts";
 
 export default {
     [cpNames.pawn]: function ([x, y]) {

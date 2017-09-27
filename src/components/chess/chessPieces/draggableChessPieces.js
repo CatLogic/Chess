@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {DragSource} from "react-dnd";
-import {chessPiecesNames as cpNames, dragType} from "../../../consts";
+import {cpNames as cpNames, dragType} from "../../../consts";
 import ChessPieces from "./index";
 
 function collect(connect, monitor) {

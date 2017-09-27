@@ -1,4 +1,4 @@
-import {playerStatuses, chessPiecesNames} from "./consts";
+import {playerStatuses, cpNames} from "./consts";
 
 class Player {
     constructor(side) {
@@ -22,7 +22,7 @@ class Player {
     }
 
     getKing() {
-        return this.chessPieces[chessPiecesNames.king][0];
+        return this.chessPieces[cpNames.king][0];
     }
 
     setState(state){
