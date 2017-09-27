@@ -1,4 +1,4 @@
-import {cellCharToInt, vectorRay} from "./chessUtils";
+import {cellCharToInt, vectorRay, isSameCoords} from "./chessUtils";
 import {defaultVectorConfig} from "./consts";
 import Cell from "./cell";
 
@@ -54,7 +54,7 @@ class Grid {
         return pieceOnCell;
     }
 
-    move(from, to) {
+    validateMove(from, to) {
         let fromCell = this.getCell(from);
         let toCell = this.getCell(to);
         let cpOnFrom = fromCell.getPiece();
@@ -69,7 +69,15 @@ class Grid {
         ];
         if (!cpOnFrom.isValidStep(coordsDif)) throw new Error("This chess piece cant move here.");
 
-        /* Successful */
+        return true;
+    }
+
+    move(from, to) {
+        let fromCell = this.getCell(from);
+        let toCell = this.getCell(to);
+        let cpOnFrom = fromCell.getPiece();
+        let cpOnTo = toCell.getPiece();
+
         this.movePiece(from, to);
         cpOnFrom.moveCallback && cpOnFrom.moveCallback(toCell.coords);
         return {
@@ -94,6 +102,7 @@ class Grid {
     }
 
     vectorRayFacade(vector, cell, callback) {
+        let aConfig = this.assumptions;
         const vConfig = Object.assign(
             {}, defaultVectorConfig,
             typeof vector === "string" ? {name: vector} : vector
@@ -114,6 +123,18 @@ class Grid {
                 (thisCellPiece.getSide() === cpSide ? "ally" : "enemy") :
                 null;
 
+            if (aConfig) {
+                if (aConfig.assumeAsEmpty && aConfig.assumeAsEmpty.find(aCoord => isSameCoords(aCoord,curCoords))) {
+                    cellContain = null;
+                    console.log('assumptions done', cellContain);
+                }
+                if(aConfig.assumeAsEnemy && aConfig.assumeAsEnemy.find(aCoord => isSameCoords(aCoord,curCoords))){
+                    cellContain = "enemy";
+                    console.log('assumptions done', cellContain);
+                }
+
+            }
+
             if (cellContain === "ally") {
                 if (vConfig.onAlly[0]) callback(thisCell);
                 if (vConfig.onAlly[1]) return false;
@@ -128,6 +149,14 @@ class Grid {
             }
             iteration++;
         });
+    }
+
+    removeAssumptions() {
+        this.assumptions = null;
+    }
+
+    setAssumptions(assumption) {
+        this.assumptions = assumption;
     }
 }
 

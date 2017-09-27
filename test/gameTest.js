@@ -1,7 +1,6 @@
 const {describe, it} = require('mocha');
 const assert = require('assert');
 
-// todo: uncomplited
 describe("In-game step tests", function () {
     const Chess = require('../src/chess').default;
     const chess = new Chess();

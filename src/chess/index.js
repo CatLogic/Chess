@@ -10,8 +10,6 @@ class Chess {
         this.grid = new Grid();
         this.players = null;
         this.currentPlayer = null;
-        //this.timer = false; // todo:optional
-        //this.history = []; //todo:optional
     }
 
     start() {
@@ -35,8 +33,8 @@ class Chess {
         const placeRow = (rowI, player) => {
             for (let colI = 1; colI <= 8; colI++) {
                 let cpName =
-                    chessPiecesOrder[(player.tagName === "white" ? rowI + 1 : rowI) % 2][colI - 1];
-                let chessPiece = new ChessPiece(cpName, player.tagName);
+                    chessPiecesOrder[(player.getSide() === "white" ? rowI + 1 : rowI) % 2][colI - 1];
+                let chessPiece = new ChessPiece(cpName, player.getSide());
 
                 player.addPiece(chessPiece);
                 this.grid.placePiece([colI, rowI], chessPiece);
@@ -53,52 +51,48 @@ class Chess {
     }
 
     move(from, to) {
-        let fromCell = this.grid.getCell(from);
-        let cpOnFrom = fromCell.getPiece();
-
-        if (!cpOnFrom) throw new Error("Nothing can`t be moved.");
-        if (this.currentPlayer.getSide() !== cpOnFrom.getSide()) throw new Error("Players can move only their chess pieces.");
+        // Preventing moves which gonna put actor king in danger
+        this.beforeMove(from, to);
 
         let moveResult = this.grid.move(from, to);
         if (moveResult.valid) {
-            this.currentPlayer = this.currentPlayer.tagName === "white" ?
-                this.players["black"] :
-                this.players["white"];
-
+            this.switchPlayer();
             if (moveResult.victim) this.currentPlayer.removePiece(moveResult.victim);
-            this.checkPlayer();
+            // Update opposite player status
+            this.afterMove();
         }
         return moveResult;
     }
 
-    playerPossibleMoves(player) {
-        const validSteps = new Set();
-        const pieces = player.getChessPieces(true);
+    beforeMove(from, to) {
+        let actorSide = this.currentPlayer.getSide();
+        let fromCell = this.grid.getCell(from);
+        let cpOnFrom = fromCell.getPiece();
 
-        pieces.forEach((piece) => {
-            const coord = this.grid.getPieceCoords(piece);
-            this.possibleMoves(coord).forEach((move) => {
-                // Cell instance is unique, so their coordinates keep being the same array
-                // and this is reason, why new Set() is a good data storage
-                validSteps.add(move);
-            });
-        });
-        return [...validSteps];
+        /* Simple checks */
+        if (!cpOnFrom) throw new Error("Nothing can`t be moved.");
+        if (actorSide !== cpOnFrom.getSide()) throw new Error("Players can move only their chess pieces.");
+        this.grid.validateMove(from, to);
+
+        /* Checks based at assuming next player state */
+
+        let actor = this.currentPlayer;
+        let actorKing = actor.getKing();
+        // If king acting we need to use "to" coordinates instead, to correct prediction
+        let actorKingCoords = actorKing === cpOnFrom ? to : this.grid.getPieceCoords(actorKing);
+        let enemy = actorSide === "white" ?
+            this.getPlayers()["black"] :
+            this.getPlayers()["white"];
+
+        this.grid.setAssumptions({assumeAsEmpty: [from], assumeAsEnemy: [to]});
+        let enemyMovesOnHisTurn = this.playerPossibleMoves(enemy);
+        let willBeActorInDanger = enemyMovesOnHisTurn.find(c => isSameCoords(c, actorKingCoords));
+        this.grid.removeAssumptions();
+        if (willBeActorInDanger) throw new Error("Players can`t move here. It will put hist king in danger.");
+        return true;
     }
 
-    possibleMoves(coords) {
-        if (this.state === "started") return this.grid.collectPossibleMoves(coords);
-        else throw new Error("Nothing to collect. Game isn`t started.");
-    }
-
-    playerWon(winner) {
-        const winnerSide = winner.getSide();
-        this.state = "finished";
-        this.currentPlayer = null;
-        this.players[winnerSide].setState("winner");
-    }
-
-    checkPlayer(playerName) {
+    afterMove(playerName) {
         // By default:
         // opponentPlayer is who made last move
         // playerToCheck is who gonna move after this check
@@ -119,19 +113,54 @@ class Chess {
         });
 
         if (playerToCheckStatus.inDanger && playerToCheckStatus.canMove) {
-            checkingPlayer.setState(playerStatuses.checkmate);
+            checkingPlayer.setState(playerStatuses.inCheck);
         }
-        else if (playerToCheckStatus.inDanger) checkingPlayer.setState(playerStatuses.check);
+        else if (playerToCheckStatus.inDanger) checkingPlayer.setState(playerStatuses.inCheck);
         else checkingPlayer.setState(playerStatuses.safe);
     }
 
+    playerPossibleMoves(player) {
+        const validSteps = new Set();
+        const pieces = player.getChessPieces(true);
+
+        pieces.forEach((piece) => {
+            const coord = this.grid.getPieceCoords(piece);
+            // Return cell instances
+            this.possibleMoves(coord).forEach((move) => {
+                // Cell instance is unique, so their coordinates keep being the same array
+                // and this is reason, why new Set() is a good data storage
+                validSteps.add(move);
+            });
+        });
+        return [...validSteps];
+    }
+
+    possibleMoves(coords) {
+        if (this.state === "started") return this.grid.collectPossibleMoves(coords);
+        else throw new Error("Nothing to collect. Game isn`t started.");
+    }
+
+    /*playerWon(winner) {
+        const winnerSide = winner.getSide();
+        this.state = "finished";
+        this.currentPlayer = null;
+        this.players[winnerSide].setState("winner");
+    }*/
+
+
     currentPlayerName() {
-        if (this.state === "started") return this.currentPlayer ? this.currentPlayer.tagName : null;
+        if (this.state === "started") return this.currentPlayer ? this.currentPlayer.getSide() : null;
         else throw new Error("Game isn`t started. Current player don`t exist.");
     }
 
     getPlayers() {
         return this.players;
+    }
+
+    switchPlayer() {
+        this.currentPlayer = this.currentPlayer.getSide() === "white" ?
+            this.players["black"] :
+            this.players["white"];
     }
 }
 

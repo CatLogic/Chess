@@ -15,6 +15,10 @@ class Player {
         return this.state;
     }
 
+    inDanger(){
+        return this.state === playerStatuses.inCheck;
+    }
+
     getChessPieces(united) {
         return !united ?
             this.chessPieces :
