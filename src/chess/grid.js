@@ -124,15 +124,12 @@ class Grid {
                 null;
 
             if (aConfig) {
-                if (aConfig.assumeAsEmpty && aConfig.assumeAsEmpty.find(aCoord => isSameCoords(aCoord,curCoords))) {
-                    cellContain = null;
-                    console.log('assumptions done', cellContain);
-                }
-                if(aConfig.assumeAsEnemy && aConfig.assumeAsEnemy.find(aCoord => isSameCoords(aCoord,curCoords))){
-                    cellContain = "enemy";
-                    console.log('assumptions done', cellContain);
-                }
-
+                if (aConfig.assumeAsEmpty &&
+                    aConfig.assumeAsEmpty.find(aCoord => isSameCoords(aCoord, curCoords))
+                ) cellContain = null;
+                if (aConfig.assumeAsEnemy &&
+                    aConfig.assumeAsEnemy.find(aCoord => isSameCoords(aCoord, curCoords))
+                ) cellContain = "enemy";
             }
 
             if (cellContain === "ally") {
