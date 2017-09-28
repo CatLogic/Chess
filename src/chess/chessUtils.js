@@ -12,11 +12,15 @@ export const inBounds = ([x, y]) => (x >= 1 && x <= 8) && (y >= 1 && y <= 8);
 
 export const isSameCoords = (c1, c2) => ((c1[0] === c2[0]) && (c1[1] === c2[1]));
 
+export const containCoord = (coord, array) => (!!array.find((c) => isSameCoords(c, coord)));
+
 export const getPathDif = (from, to) => {
     let fromCoords = from === "string" ? cellNameToCoords(from) : from;
     let toCoords = to === "string" ? cellNameToCoords(to) : to;
     return [toCoords[0] - fromCoords[0], toCoords[1] - fromCoords[1]];
 };
+
+/* Vectors */
 
 export const vectorCheck = {
     [stepVectors.up]: ([x, y]) => (x === 0 && y > 0),

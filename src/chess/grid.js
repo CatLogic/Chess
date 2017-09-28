@@ -1,4 +1,4 @@
-import {cellCharToInt, vectorRay, isSameCoords} from "./chessUtils";
+import {cellCharToInt, vectorRay, containCoord} from "./chessUtils";
 import {defaultVectorConfig} from "./consts";
 import Cell from "./cell";
 
@@ -101,6 +101,26 @@ class Grid {
         return validCells;
     }
 
+    possibleWayTo(coords, checkCoords) {
+        const fromCell = this.getCell(coords);
+        const chessPiece = fromCell.getPiece();
+        let wayTo = null;
+
+        chessPiece.vectors.forEach((vector) => {
+            const cells = [];
+            let isValid = false;
+            this.vectorRayFacade(vector, fromCell, function (cell) {
+                const curCoords = cell.getCoords();
+                cells.push(curCoords);
+                if (containCoord(curCoords, checkCoords)) isValid = true;
+            });
+
+            if (isValid) wayTo = [coords].concat(cells);
+        });
+
+        return wayTo;
+    }
+
     vectorRayFacade(vector, cell, callback) {
         let aConfig = this.assumptions;
         const vConfig = Object.assign(
@@ -124,12 +144,8 @@ class Grid {
                 null;
 
             if (aConfig) {
-                if (aConfig.assumeAsEmpty &&
-                    aConfig.assumeAsEmpty.find(aCoord => isSameCoords(aCoord, curCoords))
-                ) cellContain = null;
-                if (aConfig.assumeAsEnemy &&
-                    aConfig.assumeAsEnemy.find(aCoord => isSameCoords(aCoord, curCoords))
-                ) cellContain = "enemy";
+                if (aConfig.assumeAsEmpty && containCoord(curCoords, aConfig.assumeAsEmpty)) cellContain = null;
+                if (aConfig.assumeAsEnemy && containCoord(curCoords, aConfig.assumeAsEnemy)) cellContain = "enemy";
             }
 
             if (cellContain === "ally") {

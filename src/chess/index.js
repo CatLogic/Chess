@@ -1,5 +1,5 @@
 import {cpNames as cpNames, playerStatuses} from "./consts";
-import {isSameCoords} from "./chessUtils";
+import {containCoord} from "./chessUtils";
 import Player from "./player";
 import Grid from "./grid";
 import ChessPiece from "./chessPiece/chessPiece";
@@ -51,6 +51,8 @@ class Chess {
     }
 
     move(from, to) {
+        if (this.state !== "started") throw new Error("Move isn`t possible. Game isn`t started.");
+
         // Preventing moves which gonna put actor king in danger
         this.beforeMove(from, to);
 
@@ -58,8 +60,7 @@ class Chess {
         if (moveResult.valid) {
             this.switchPlayer();
             if (moveResult.victim) this.currentPlayer.removePiece(moveResult.victim);
-            // Update opposite player status
-            this.afterMove();
+            this.checkPlayer(this.currentPlayer);
         }
         return moveResult;
     }
@@ -75,7 +76,6 @@ class Chess {
         this.grid.validateMove(from, to);
 
         /* Checks based at assuming next player state */
-
         let actor = this.currentPlayer;
         let actorKing = actor.getKing();
         // If king acting we need to use "to" coordinates instead, to correct prediction
@@ -84,45 +84,74 @@ class Chess {
             this.getPlayers()["black"] :
             this.getPlayers()["white"];
 
-        this.grid.setAssumptions({assumeAsEmpty: [from], assumeAsEnemy: [to]});
-        let enemyMovesOnHisTurn = this.playerPossibleMoves(enemy);
-        let willBeActorInDanger = enemyMovesOnHisTurn.find(c => isSameCoords(c, actorKingCoords));
-        this.grid.removeAssumptions();
-        if (willBeActorInDanger) throw new Error("Players can`t move here. It will put hist king in danger.");
+        // Collecting enemy moves with predictions and compare with king coords
+        let enemyMovesOnHisTurn = this.playerPossibleMoves(enemy, {assumeAsEmpty: [from], assumeAsEnemy: [to]});
+        if (containCoord(actorKingCoords, enemyMovesOnHisTurn)) throw new Error("Players can`t move here. It will put hist king in danger.");
+
+        // If player was in danger but moving to safe position, lets update his state
+        if (actor.inDanger()) actor.setState(playerStatuses.safe);
         return true;
     }
 
-    afterMove(playerName) {
-        // By default:
-        // opponentPlayer is who made last move
-        // playerToCheck is who gonna move after this check
-        const checkingPlayer = playerName ? this.players[playerName] : this.currentPlayer;
-        const opponentPlayer = this.players[checkingPlayer === "white" ? "black" : "white"];
+    checkPlayer(checkingPlayer, oppositePlayer) {
+        const opponentPlayer = oppositePlayer ||
+            this.players[checkingPlayer.getSide() === "white" ? "black" : "white"];
         const king = checkingPlayer.getKing();
         const kingCoords = this.grid.getPieceCoords(king);
-        const kingMoves = this.possibleMoves(kingCoords);
-        const opponentMoves = this.playerPossibleMoves(opponentPlayer);
-        const playerToCheckStatus = {
-            inDanger: false,
-            canMove: !!kingMoves.length
-        };
+        const opponentMoves = this.playerPossibleMoves(opponentPlayer); // don`t provide details
+        const inDanger = containCoord(kingCoords, opponentMoves);
 
-        opponentMoves.forEach(([x, y]) => {
-            // in danger check
-            if (isSameCoords([x, y], kingCoords)) playerToCheckStatus.inDanger = true;
-        });
+        // todo: stalemate
 
-        if (playerToCheckStatus.inDanger && playerToCheckStatus.canMove) {
+        if (inDanger) {
+            // Despite any further code, player at least gonna be "inCheck"
             checkingPlayer.setState(playerStatuses.inCheck);
+
+            // Lets try to check if king able to help himself
+            const kingMoves = this.possibleMoves(kingCoords);
+            const kingSafeMoves = [];
+            kingMoves.forEach((kMove) => {
+                const isDangerousMove = containCoord(kMove, opponentMoves);
+                if (!isDangerousMove) kingSafeMoves.push(kMove);
+            });
+
+            // king can help himself
+            if (kingSafeMoves.length) {
+                checkingPlayer.setState(playerStatuses.inCheck);
+            } else {
+                // King cant escape by just moving himself
+                // First, lets figure out which piece(s) is cause of threat
+                const sourceOfThreat = this.playerPossibleWaysTo(opponentPlayer, [kingCoords]);
+                const checkingPlayerMoves = this.playerPossibleMoves(checkingPlayer);
+
+                // If sourceOfThreat.length === 1,
+                // Possibility to attack enemy piece or block its way
+                if (sourceOfThreat.length === 1) {
+                    const canPreventThread = !!sourceOfThreat[0].way.find((wayCoord) =>
+                        containCoord(wayCoord, checkingPlayerMoves));
+                    checkingPlayer.setState(
+                        canPreventThread ?
+                            playerStatuses.inCheck :
+                            playerStatuses.checkmated
+                    );
+                } else if (sourceOfThreat.length >= 2) {
+                    // In this case, we already know that king can`t move to save position
+                    // but we also can`t attack 2 enemy pieces at time
+                    checkingPlayer.setState(playerStatuses.checkmated);
+                }
+            }
+
+            //todo decide to continue game or praise the winner
+            //this.finishGame();
         }
-        else if (playerToCheckStatus.inDanger) checkingPlayer.setState(playerStatuses.inCheck);
         else checkingPlayer.setState(playerStatuses.safe);
     }
 
-    playerPossibleMoves(player) {
+    playerPossibleMoves(player, assumption) {
+        assumption && this.grid.setAssumptions(assumption);
+        // todo: remove Set and use isSameCoords
         const validSteps = new Set();
         const pieces = player.getChessPieces(true);
-
         pieces.forEach((piece) => {
             const coord = this.grid.getPieceCoords(piece);
             // Return cell instances
@@ -132,12 +161,35 @@ class Chess {
                 validSteps.add(move);
             });
         });
+        assumption && this.grid.removeAssumptions();
         return [...validSteps];
+    }
+
+    playerPossibleWaysTo(player, checkCoords) {
+        const pieces = player.getChessPieces(true);
+        const capablePieces = [];
+
+        pieces.forEach(piece => {
+            const coord = this.grid.getPieceCoords(piece);
+            let way = this.possibleWaysTo(coord, checkCoords);
+            way && capablePieces.push({pieceName: piece.getName(), coord, way});
+        });
+
+        return capablePieces;
     }
 
     possibleMoves(coords) {
         if (this.state === "started") return this.grid.collectPossibleMoves(coords);
         else throw new Error("Nothing to collect. Game isn`t started.");
+    }
+
+    possibleWaysTo(coords, checkCoords) {
+        if (this.state === "started") return this.grid.possibleWayTo(coords, checkCoords);
+        else throw new Error("Nothing to collect. Game isn`t started.");
+    }
+
+    finishGame() {
+        alert("TODO: WIN");
     }
 
     /*playerWon(winner) {

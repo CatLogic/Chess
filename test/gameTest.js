@@ -26,15 +26,14 @@ describe("In-game step tests", function () {
             vectors[0].maxLength
         );
     });
-    it("B:Pawn: \"a7\" => \"a5\"", () => {
-        // black pawn: "a7" => "a5"
+    it("B:Pawn: \"e7\" => \"e5\"", () => {
         assert.equal(
             true,
             chess.move([5, 7], [5, 5]).valid
         )
     });
 
-    it("W:Pawn step on enemy pawn: \"a7\" => \"a5\"", () => {
+    it("W:Pawn step on enemy pawn: \"d4\" => \"e5\"", () => {
         assert.equal(
             true,
             chess.move([4, 4], [5, 5]).valid
@@ -42,23 +41,40 @@ describe("In-game step tests", function () {
     });
 
     it("Some other moves", () => {
-        // B
+        // B:knight "g8" -> "h6"
         assert.equal(
             true,
             chess.move([7, 8], [8, 6]).valid
         );
-        // W
+        // W:bishop "c1" -> "h6"
         assert.equal(
             true,
-            chess.move([5, 5], [5, 6]).valid
+            chess.move([3, 1], [8, 6]).valid
         );
-        // B
+        // B:bishop "f8" -> "b4"
         assert.equal(
             true,
             chess.move([6, 8], [2, 4]).valid
         )
     });
-    // тут у белых шах
+
+    it("White player state is \"inCheck\"", () => {
+        assert.equal(
+            "inCheck", chess.getPlayers().white.getState()
+        )
+    });
+
+    it("White player leaving \"inCheck\" state", () => {
+        // W:pawn "c2" -> "c3"
+        chess.move([3, 2], [3, 3]);
+        assert.equal(
+            "safe", chess.getPlayers().white.getState()
+        )
+    });
+
+    it("Steps leading to \"checkmate\" status.", () => {
+
+    })
 
     //todo: сделать еще несколько ходов и включить проверку на возможные ходы для других фигур
 });
